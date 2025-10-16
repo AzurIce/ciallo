@@ -57,6 +57,10 @@ ciallo check
 # Run 'cmd.bench' defined in `ciallo.toml`
 ciallo bench
 
+# Pass additional arguments to the command
+ciallo check --release
+ciallo bench -- --save-baseline 0721
+
 # Use a custom config file
 ciallo -c /path/to/config.toml check
 ```

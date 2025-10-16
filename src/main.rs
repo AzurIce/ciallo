@@ -14,6 +14,10 @@ struct Cli {
     /// Command name to execute from ciallo.toml
     command: String,
 
+    /// Additional arguments to pass to the command
+    #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+    args: Vec<String>,
+
     /// Path to config file
     #[arg(short, long, default_value = "ciallo.toml")]
     config: String,
@@ -52,7 +56,7 @@ fn main() -> Result<()> {
 
     // Execute command
     info!("Executing {} with hooks: {:?}", cmd.command, cmd.hooks);
-    let result = executor::execute_command(cmd).context("Failed to execute command")?;
+    let result = executor::execute_command(cmd, &cli.args).context("Failed to execute command")?;
     info!(
         "Command finished with status: {}",
         if result.success { "SUCCESS" } else { "FAILED" }

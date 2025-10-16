@@ -13,7 +13,7 @@ pub struct ExecutionResult {
     pub stderr: String,
 }
 
-pub fn execute_command(cmd: &Command) -> Result<ExecutionResult> {
+pub fn execute_command(cmd: &Command, extra_args: &[String]) -> Result<ExecutionResult> {
     // Parse command
     let parts: Vec<&str> = cmd.command.split_whitespace().collect();
     if parts.is_empty() {
@@ -39,6 +39,7 @@ pub fn execute_command(cmd: &Command) -> Result<ExecutionResult> {
     let start_time = Instant::now();
     let mut child = StdCommand::new(program)
         .args(args)
+        .args(extra_args)
         .stdout(stdout_cfg)
         .stderr(stderr_cfg)
         .spawn()
