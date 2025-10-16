@@ -28,7 +28,12 @@ fn main() -> Result<()> {
         .filter_level(log::LevelFilter::Info)
         .init();
 
-    let cli = Cli::parse();
+    let mut cli = Cli::parse();
+
+    // If args exist and user used --, prepend -- to preserve it for the underlying command
+    if !cli.args.is_empty() && std::env::args().any(|arg| arg == "--") {
+        cli.args.insert(0, "--".to_string());
+    };
 
     // Load global config
     let global_config = GlobalConfig::load().context("Failed to load global config")?;
