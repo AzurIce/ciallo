@@ -1,21 +1,17 @@
-# Can define many hooks used to notify the cmd status
-# Currently only support feishu, maybe support discord or sth in future
-[hook.myhook1.feishu]
-webhook-url = "url-to-feishu-bot"
-
-[hook.myhook2.feishu]
-webhook-url = "url-to-feishu-bot"
-
-# Support in future
-# [hook.myhook3.web]
-# ip = "127.0.0.1" # Default: "127.0.0.1"
-# port = 4514    # Default: 4514
+# Hooks are defined in global config file located at ~/.config/ciallo/config.toml
+# Example:
+# [hook.hook_name.feishu]
+# webhook_url = "url-to-feishu-bot"
+#
+# [hook.feishu.feishu]
+# webhook_url = "url-to-feishu-bot"
 
 [cmd.bench]
 command = "cargo bench"
 stdout = "piped" # Default: piped, Available: null, piped, captured
 stderr = "piped" # Default: piped, Available: null, piped, captured
-hooks = [ "myhook1", "myhook2" ] # Default: []
+hooks = [ "hook_name", "feishu" ] # Default: []
 
-[cmd.run]
-command = "cargo run"
+[cmd.check]
+command = "cargo check"
+hooks = [ "feishu" ]
