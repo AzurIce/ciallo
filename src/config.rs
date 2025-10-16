@@ -33,16 +33,20 @@ pub struct FeishuHook {
 #[derive(Debug, Deserialize)]
 pub struct Command {
     pub command: String,
-    #[serde(default = "default_io")]
-    pub stdout: String,
-    #[serde(default = "default_io")]
-    pub stderr: String,
+    #[serde(default = "default_stdout")]
+    pub stdout: bool,
+    #[serde(default = "default_stderr")]
+    pub stderr: bool,
     #[serde(default)]
     pub hooks: Vec<String>,
 }
 
-fn default_io() -> String {
-    "piped".to_string()
+fn default_stdout() -> bool {
+    true
+}
+
+fn default_stderr() -> bool {
+    true
 }
 
 impl ProjectConfig {

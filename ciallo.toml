@@ -8,8 +8,8 @@
 
 [cmd.bench]
 command = "cargo bench"
-stdout = "piped" # Default: piped, Available: null, piped, captured
-stderr = "piped" # Default: piped, Available: null, piped, captured
+stdout = true # Default: true
+stderr = true # Default: true
 hooks = [ "hook_name", "feishu" ] # Default: []
 
 [cmd.check]

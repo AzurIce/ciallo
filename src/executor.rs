@@ -24,16 +24,16 @@ pub fn execute_command(cmd: &Command) -> Result<ExecutionResult> {
     let args = &parts[1..];
 
     // Configure stdio based on config
-    let stdout_cfg = match cmd.stdout.as_str() {
-        "null" => Stdio::null(),
-        "piped" | "captured" => Stdio::piped(),
-        _ => Stdio::piped(),
+    let stdout_cfg = if cmd.stdout {
+        Stdio::piped()
+    } else {
+        Stdio::null()
     };
 
-    let stderr_cfg = match cmd.stderr.as_str() {
-        "null" => Stdio::null(),
-        "piped" | "captured" => Stdio::piped(),
-        _ => Stdio::piped(),
+    let stderr_cfg = if cmd.stderr {
+        Stdio::piped()
+    } else {
+        Stdio::null()
     };
 
     let start_time = Instant::now();
