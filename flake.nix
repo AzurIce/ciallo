@@ -1,56 +1,61 @@
 {
-  description = "demo-iced";
-
-  nixConfig = {
-    extra-substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store"
-    ];
-    trusted-substituters = [
-      "https://mirrors.ustc.edu.cn/nix-channels/store"
-    ];
-  };
+  description = "A simple command line tool enables you to interact with LLMs.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    rust-overlay.url = "github:oxalica/rust-overlay";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    crane.url = "github:ipetkov/crane";
     flake-utils.url = "github:numtide/flake-utils";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs =
-    {
-      nixpkgs,
-      rust-overlay,
-      flake-utils,
-      ...
-    }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
+  outputs = { self, nixpkgs, crane, flake-utils, rust-overlay, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
-          inherit system overlays;
+          inherit system;
+          overlays = [ (import rust-overlay) ];
         };
-        rust-tools = pkgs.rust-bin.stable.latest.default.override {
-          extensions = [ "rust-src" ];
+
+        craneLib = (crane.mkLib pkgs).overrideToolchain (
+          p:
+          p.rust-bin.stable.latest.default.override {}
+        );
+
+        # Common arguments can be set here to avoid repeating them later
+        # Note: changes here will rebuild all dependency crates
+        commonArgs = {
+          src = craneLib.cleanCargoSource ./.;
+          strictDeps = true;
+
+          buildInputs = [];
         };
+
+        ciallo = craneLib.buildPackage (commonArgs // {
+          cargoArtifacts = craneLib.buildDepsOnly commonArgs;
+
+          # Additional environment variables or build phases/hooks can be set
+          # here *without* rebuilding all dependency crates
+          # MY_CUSTOM_VAR = "some value";
+        });
       in
       {
-        devShells.default = pkgs.mkShell {
-          # prioritize system clang, see https://github.com/zed-industries/zed/issues/7036
-          # https://github.com/gfx-rs/gfx/issues/2309
-          # https://mac.install.guide/commandlinetools/7
-          shellHook = ''
-            export PATH=/usr/bin:$PATH
-          '';
-
-          buildInputs =
-            with pkgs;
-            [
-            ]
-            ++ [
-              rust-tools
-            ];
+        checks = {
+          inherit ciallo;
         };
-      }
-    );
+
+        packages.default = ciallo;
+
+        apps.default = flake-utils.lib.mkApp {
+          drv = ciallo;
+        };
+
+        devShells.default = craneLib.devShell {
+          checks = self.checks.${system};
+
+          packages = [];
+        };
+      });
 }
