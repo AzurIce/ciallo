@@ -13,9 +13,9 @@ pub struct FeishuMessage {
 impl From<ExecutionResult> for FeishuMessage {
     fn from(result: ExecutionResult) -> Self {
         let status = if result.success {
-            "✅ success"
+            "Ciallo～(∠・ω< )⌒✅ success"
         } else {
-            "❌ failure"
+            "Ciallo～(∠・ω< )⌒❌ failure"
         };
         Self {
             msg: format!(

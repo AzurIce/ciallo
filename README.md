@@ -1,4 +1,4 @@
-# Ciallo
+# Ciallo～(∠・ω< )⌒☆
 
 A Rust CLI tool for executing commands with webhook notifications.
 
